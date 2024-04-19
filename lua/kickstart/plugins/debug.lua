@@ -170,7 +170,6 @@ return {
       },
     }
 
-    -- Install golang specific config
     require('nvim-dap-virtual-text').setup {}
   end,
 }
