@@ -155,7 +155,7 @@ return {
 
     dap.listeners.after.event_terminated['hover_keymap'] = function()
       for _, keymap in pairs(keymap_restore) do
-        vim.api.nvim_buf_set_keymap(keymap.buffer, keymap.mode, keymap.lhs, keymap.rhs or '', {
+        vim.api.nvim_buf_set_keymap(keymap.buffer, keymap.mode, keymap.lhs, keymap.rhs, {
           silent = keymap.silent == 1,
         })
       end
@@ -265,6 +265,67 @@ return {
       },
     }
 
-    require('nvim-dap-virtual-text').setup {}
+    dap.adapters.lldb = {
+      type = 'executable',
+      command = '/usr/bin/lldb-vscode-16',
+      name = 'lddb',
+    }
+
+    local function init_rust_commands()
+      local rustc_sysroot = vim.fn.trim(vim.fn.system 'rustc --print sysroot')
+
+      local script_import = 'command script import "' .. rustc_sysroot .. '/lib/rustlib/etc/lldb_lookup.py"'
+      local commands_file = rustc_sysroot .. '/lib/rustlib/etc/lldb_commands'
+
+      local commands = {}
+      local file = io.open(commands_file, 'r')
+      if file then
+        for line in file:lines() do
+          table.insert(commands, line)
+        end
+        file:close()
+      end
+      table.insert(commands, 1, script_import)
+
+      return commands
+    end
+
+    local function add_env()
+      local variables = {}
+      for k, v in pairs(vim.fn.environ()) do
+        table.insert(variables, string.format('%s=%s', k, v))
+      end
+      return variables
+    end
+
+    dap.configurations.rust = {
+      {
+        name = 'Launch',
+        type = 'lldb',
+        request = 'launch',
+        program = function()
+          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+        end,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+        args = {},
+        initCommands = init_rust_commands,
+        env = add_env,
+      },
+      {
+        name = 'Attach',
+        type = 'lldb',
+        request = 'attach',
+        pid = require('dap.utils').pick_process,
+        cwd = '${workspaceFolder}',
+        stopOnEntry = false,
+        args = {},
+        initCommands = init_rust_commands,
+        env = add_env,
+      },
+    }
+
+    -- Install golang specific config
+    -- require('nvim-dap-virtual-text').setup {}
   end,
 }
