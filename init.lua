@@ -124,7 +124,13 @@ vim.opt.breakindent = true
 -- Save undo history
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = os.getenv 'HOME' .. '/.vim/undodir'
+local homedir
+if vim.loop.os_uname().sysname == 'Windows_NT' then
+  homedir = os.getenv 'USERPROFILE'
+else
+  homedir = os.getenv 'HOME'
+end
+vim.opt.undodir = homedir .. '/.vim/undodir'
 vim.opt.undofile = true
 
 -- Case-insensitive searching UNLESS \C or one or more capital letters in the search term
