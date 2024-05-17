@@ -1,4 +1,4 @@
-vim.keymap.set('n', '<leader>oe', vim.cmd.Ex, { desc = '[O]pen [E]xplore (netrw)' })
+vim.keymap.set('n', '<leader>oe', '<CMD>Oil<CR>', { desc = '[O]pen [E]xplore (Oil)' })
 
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selection down' })
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move selection up' })
