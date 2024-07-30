@@ -1,3 +1,12 @@
+local function is_win()
+  return vim.loop.os_uname().sysname == 'Windows_NT'
+end
+
+-- if is_win() then
+--   vim.api.nvim_command 'set runtimepath+=C:\\PROGRA~1\\Neovim\\share\\nvim\\runtime'
+--   vim.api.nvim_command 'let &packpath = &runtimepath'
+-- end
+
 -- Set <space> as the leader key
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are loaded (otherwise wrong leader will be used)
@@ -39,7 +48,7 @@ vim.opt.breakindent = true
 vim.opt.swapfile = false
 vim.opt.backup = false
 local homedir
-if vim.loop.os_uname().sysname == 'Windows_NT' then
+if is_win() then
   homedir = os.getenv 'USERPROFILE'
 else
   homedir = os.getenv 'HOME'
